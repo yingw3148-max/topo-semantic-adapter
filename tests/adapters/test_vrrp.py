@@ -37,3 +37,17 @@ def test_parse_vrrp():
     assert ge2["vrrp_role_state"] == "Backup"
     assert ge2["vrrp_vrid"] == "2"
     assert ge2["vrrp_virtual_ip"] == "10.1.2.254"
+
+
+def test_parse_vrrp_missing_virtual_ip():
+    parser = VrrpParser()
+    context = AdapterContext(device_ip="10.0.0.1", device_id="core-sw-01", site="site-a")
+    output = """GigabitEthernet0/0/1 | Virtual Router 10
+    State: Master
+"""
+    entities = parser.parse("display vrrp", output, context)
+
+    properties = entities.nodes[0].properties
+    assert properties["vrrp_role_state"] == "Master"
+    assert properties["vrrp_vrid"] == "10"
+    assert properties["vrrp_virtual_ip"] == ""

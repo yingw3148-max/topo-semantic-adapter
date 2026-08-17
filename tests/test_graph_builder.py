@@ -53,6 +53,7 @@ def test_graph_builder_populates_topograph():
         view = graph.to_graphview()
         assert view.node_count() == 3
         assert view.edge_count() == 2
+        graph.close()
 
 
 def test_graph_builder_filters_by_intent():
@@ -66,11 +67,15 @@ def test_graph_builder_filters_by_intent():
         # impact_analysis should include link_aggregation; fault_root_cause should not.
         impact = GraphBuilder(registry=registry, intent="impact_analysis", db_path=":memory:")
         impact.consume_many(blocks)
-        assert impact.build().get_node_count() == 3
+        impact_graph = impact.build()
+        assert impact_graph.get_node_count() == 3
+        impact_graph.close()
 
         fault = GraphBuilder(registry=registry, intent="fault_root_cause", db_path=":memory:")
         fault.consume_many(blocks)
-        assert fault.build().get_node_count() == 0
+        fault_graph = fault.build()
+        assert fault_graph.get_node_count() == 0
+        fault_graph.close()
 
 
 def test_graph_builder_reconstructs_lldp_topology():
@@ -105,11 +110,13 @@ GE0/0/2           core-sw-01                GE0/0/1              120
         builder.consume_many(blocks)
         graph = builder.build()
 
-        # 2 devices + 2 interfaces on each side = 6 nodes
-        # 2 directed connects_to edges (one per device perspective)
-        assert graph.get_node_count() == 6
+        # 2 devices + 2 interfaces. Each interface appears once as the local
+        # endpoint and once as the remote endpoint, but the deterministic ID
+        # collapses them so we end up with 4 unique nodes and 2 directed edges.
+        assert graph.get_node_count() == 4
         assert graph.get_edge_count() == 2
 
         view = graph.to_graphview()
-        assert view.node_count() == 6
+        assert view.node_count() == 4
         assert view.edge_count() == 2
+        graph.close()

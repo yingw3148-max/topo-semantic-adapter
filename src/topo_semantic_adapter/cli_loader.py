@@ -46,6 +46,12 @@ class CLIFileLoader:
 
     @property
     def inspect_dir(self) -> Path:
+        # Production layouts sometimes name the site folder directly,
+        # e.g. "湖北大学配置". Prefer that, otherwise fall back to the
+        # "{site_name}-配置" convention used by earlier test fixtures.
+        direct_site = self.base_path / self.site_name
+        if direct_site.is_dir():
+            return direct_site / "inspect"
         return self.base_path / f"{self.site_name}-配置" / "inspect"
 
     def iter_blocks(self) -> Iterator[CommandBlock]:

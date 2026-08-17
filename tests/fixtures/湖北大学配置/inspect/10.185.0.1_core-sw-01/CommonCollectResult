@@ -1,0 +1,28 @@
+display lldp neighbor brief
+Local Intf        Neighbor Device ID        Neighbor Intf        Exptime
+GE0/0/1           edge-sw-02                GE0/0/1              120
+=========######HUAWEI#####=========
+display link-aggregation verbose
+Load-balance Type: Shar -- Load-balance, and NonS -- Non-Load-balance
+Port Status: S -- Selected, U -- Unselected, I -- Individual
+Local:
+Interface Eth-Trunk1
+PortName                      Status      Weight
+GigabitEthernet0/0/2          Selected    1
+GigabitEthernet0/0/3          Unselected  1
+=========######HUAWEI#####=========
+display ospf peer
+OSPF Process 1 with Router ID 1.1.1.1
+ Area 0.0.0.0 interface 10.1.1.1(GigabitEthernet0/0/1)'s neighbors
+ Router ID: 2.2.2.2          Address: 10.1.1.2
+   State: Full           Mode:Nbr is Master           Priority: 1
+=========######HUAWEI#####=========
+display vrrp
+GigabitEthernet0/0/1 | Virtual Router 1
+    State: Master
+    Virtual IP: 10.1.1.254
+=========######HUAWEI#####=========
+display dhcp snooping binding
+DHCP Snooping Bindings:
+MAC Address     IP Address      Lease Time(seconds) Type       VLAN Interface
+0001-0203-0405  10.1.1.10       86300               dhcp-snooping 10   GE0/0/2

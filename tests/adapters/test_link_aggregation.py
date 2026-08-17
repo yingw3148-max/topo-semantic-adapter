@@ -46,3 +46,25 @@ def test_parse_link_aggregation():
         ("sw1:interface:40GE0/0/4", "Individual"),
     }
     assert members == expected
+
+
+def test_parse_link_aggregation_empty_output():
+    parser = LinkAggregationParser()
+    context = AdapterContext(device_ip="10.0.0.1", device_id="sw1", site="site-a")
+    entities = parser.parse("display link-aggregation verbose", "", context)
+
+    assert len(entities.nodes) == 0
+    assert len(entities.edges) == 0
+
+
+def test_parse_link_aggregation_no_group_header():
+    parser = LinkAggregationParser()
+    context = AdapterContext(device_ip="10.0.0.1", device_id="sw1", site="site-a")
+    entities = parser.parse(
+        "display link-aggregation verbose",
+        "PortName                      Status      Weight\nGigabitEthernet0/0/1          Selected    1\n",
+        context,
+    )
+
+    assert len(entities.nodes) == 0
+    assert len(entities.edges) == 0

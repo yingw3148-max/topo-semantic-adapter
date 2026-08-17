@@ -34,3 +34,26 @@ def test_parse_dhcp_snooping():
 
     ge2 = interfaces["edge-sw-02:interface:GigabitEthernet0/0/2"]
     assert ge2["dhcp_bound_ip"] == "10.1.1.11"
+
+
+def test_parse_dhcp_snooping_colon_mac():
+    parser = DhcpSnoopingParser()
+    context = AdapterContext(device_ip="10.0.0.1", device_id="edge-sw-02", site="site-a")
+    output = """DHCP Snooping Bindings:
+MAC Address     IP Address      Lease Time(seconds) Type       VLAN Interface
+00:01:02:03:04:05  10.1.1.10       1000               dhcp-snooping 10   GE0/0/1
+"""
+    entities = parser.parse("display dhcp snooping binding", output, context)
+
+    assert len(entities.nodes) == 1
+    properties = entities.nodes[0].properties
+    assert properties["dhcp_bound_mac"] == "00:01:02:03:04:05"
+
+
+def test_parse_dhcp_snooping_empty_output():
+    parser = DhcpSnoopingParser()
+    context = AdapterContext(device_ip="10.0.0.1", device_id="edge-sw-02", site="site-a")
+    entities = parser.parse("display dhcp snooping binding", "", context)
+
+    assert len(entities.nodes) == 0
+    assert len(entities.edges) == 0

@@ -38,3 +38,14 @@ def test_parse_ospf_neighbors():
     ge2 = interfaces["core-sw-01:interface:GigabitEthernet0/0/2"]
     assert ge2["ospf_neighbor_state"] == "Init"
     assert ge2["ospf_neighbor_router_id"] == "3.3.3.3"
+
+
+def test_parse_ospf_no_neighbors():
+    parser = OspfNeighborParser()
+    context = AdapterContext(device_ip="10.0.0.1", device_id="core-sw-01", site="site-a")
+    entities = parser.parse(
+        "display ospf peer", "OSPF Process 1 with Router ID 1.1.1.1\n", context
+    )
+
+    assert len(entities.nodes) == 0
+    assert len(entities.edges) == 0

@@ -39,7 +39,7 @@ class LldpNeighborParser(CommandParser):
 
     # Brief table line: LocalIntf RemoteDevice RemoteIntf [Exptime]
     _BRIEF_LINE = re.compile(
-        r"^(?P<local_intf>\S+)\s+(?P<remote_device>\S+)\s+(?P<remote_intf>\S+)(?:\s+\S+)?$",
+        r"^\s*(?P<local_intf>\S+)\s+(?P<remote_device>\S+)\s+(?P<remote_intf>\S+)(?:\s+\S+)?$",
         re.MULTILINE,
     )
     _HEADER_TOKENS = {"local", "intf", "interface", "neighbor", "exptime"}
@@ -83,7 +83,9 @@ class LldpNeighborParser(CommandParser):
         )
 
         brief_matches = list(self._BRIEF_LINE.finditer(output))
-        if brief_matches:
+        explicit_brief = "brief" in command.lower()
+        explicit_verbose = "verbose" in command.lower()
+        if brief_matches and (explicit_brief or not explicit_verbose):
             for match in brief_matches:
                 local_intf = match.group("local_intf")
                 remote_device = match.group("remote_device")
@@ -138,6 +140,7 @@ class LldpNeighborParser(CommandParser):
         remote_device: str,
         remote_intf: str,
     ) -> None:
+        local_source = device_source(context)
         local_intf_canon = canonicalize_interface_name(local_intf)
         remote_intf_canon = canonicalize_interface_name(remote_intf)
 
@@ -184,7 +187,7 @@ class LldpNeighborParser(CommandParser):
                 relation="connects_to",
                 properties={
                     "protocol": "lldp",
-                    "local_device": source,
+                    "local_device": local_source,
                     "remote_device": remote_device,
                 },
                 provenance="display lldp neighbor",

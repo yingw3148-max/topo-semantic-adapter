@@ -31,3 +31,64 @@ def test_parse_lldp_brief():
     edges = entities.edges
     assert len(edges) == 2
     assert all(edge.relation == "connects_to" for edge in edges)
+
+
+VERBOSE_OUTPUT = """System Name: edge-sw-02
+Port ID: GigabitEthernet0/0/2
+Local Interface: GigabitEthernet0/0/1
+
+System Name: core-sw-03
+Port ID: XGigabitEthernet0/0/4
+Local Intf: XGigabitEthernet0/0/3
+"""
+
+
+def test_parse_lldp_verbose_fallback():
+    parser = LldpNeighborParser()
+    context = AdapterContext(device_ip="10.0.0.1", device_id="core-sw-01", site="site-a")
+    entities = parser.parse("display lldp neighbor verbose", VERBOSE_OUTPUT, context)
+
+    device_ids = {node.id for node in entities.nodes if node.kind == "device"}
+    assert "core-sw-01:device:core-sw-01" in device_ids
+    assert "edge-sw-02:device:edge-sw-02" in device_ids
+    assert "core-sw-03:device:core-sw-03" in device_ids
+
+    interface_ids = {node.id for node in entities.nodes if node.kind == "interface"}
+    assert "core-sw-01:interface:GigabitEthernet0/0/1" in interface_ids
+    assert "edge-sw-02:interface:GigabitEthernet0/0/2" in interface_ids
+    assert "core-sw-01:interface:XGigabitEthernet0/0/3" in interface_ids
+    assert "core-sw-03:interface:XGigabitEthernet0/0/4" in interface_ids
+
+    assert len(entities.edges) == 2
+
+
+def test_parse_lldp_headers_only():
+    parser = LldpNeighborParser()
+    context = AdapterContext(device_ip="10.0.0.1", device_id="core-sw-01", site="site-a")
+    output = "Local Intf        Neighbor Device ID        Neighbor Intf        Exptime\n"
+    entities = parser.parse("display lldp neighbor brief", output, context)
+
+    assert any(node.kind == "device" for node in entities.nodes)
+    assert len(entities.edges) == 0
+
+
+def test_parse_lldp_empty_output():
+    parser = LldpNeighborParser()
+    context = AdapterContext(device_ip="10.0.0.1", device_id="core-sw-01", site="site-a")
+    entities = parser.parse("display lldp neighbor brief", "", context)
+
+    assert any(node.id == "core-sw-01:device:core-sw-01" for node in entities.nodes)
+    assert len(entities.edges) == 0
+
+
+def test_parse_lldp_verbose_missing_local_intf_is_skipped():
+    parser = LldpNeighborParser()
+    context = AdapterContext(device_ip="10.0.0.1", device_id="core-sw-01", site="site-a")
+    output = """System Name: edge-sw-02
+Port ID: GigabitEthernet0/0/2
+"""
+    entities = parser.parse("display lldp neighbor verbose", output, context)
+
+    # Local device is always emitted, but no neighbor edge without local intf.
+    assert any(node.id == "core-sw-01:device:core-sw-01" for node in entities.nodes)
+    assert len(entities.edges) == 0

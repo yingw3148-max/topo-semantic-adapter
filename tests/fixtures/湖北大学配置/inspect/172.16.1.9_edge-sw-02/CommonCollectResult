@@ -1,0 +1,21 @@
+display lldp neighbor brief
+Local Intf        Neighbor Device ID        Neighbor Intf        Exptime
+GE0/0/1           core-sw-01                GE0/0/1              120
+=========######HUAWEI#####=========
+display link-aggregation verbose
+Load-balance Type: Shar -- Load-balance, and NonS -- Non-Load-balance
+Port Status: S -- Selected, U -- Unselected, I -- Individual
+Local:
+Interface Eth-Trunk1
+PortName                      Status      Weight
+GigabitEthernet0/0/2          Selected    1
+=========######HUAWEI#####=========
+display vrrp
+GigabitEthernet0/0/1 | Virtual Router 1
+    State: Backup
+    Virtual IP: 10.1.1.254
+=========######HUAWEI#####=========
+display dhcp snooping binding
+DHCP Snooping Bindings:
+MAC Address     IP Address      Lease Time(seconds) Type       VLAN Interface
+0001-0203-0406  10.1.2.11       86000               dhcp-snooping 20   GE0/0/1
