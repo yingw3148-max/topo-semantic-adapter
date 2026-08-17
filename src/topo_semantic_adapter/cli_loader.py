@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator
+import unicodedata
 
 # The delimiter used by the Huawei collection tool to separate command blocks.
 DEFAULT_DELIMITER = "=========######HUAWEI#####========="
@@ -52,6 +53,15 @@ class CLIFileLoader:
         direct_site = self.base_path / self.site_name
         if direct_site.is_dir():
             return direct_site / "inspect"
+
+        # Some filesystems / Git clones store Unicode names in a different
+        # normalization form. Try to find a directory whose normalized name
+        # matches the requested site name.
+        target = unicodedata.normalize("NFC", self.site_name)
+        for entry in self.base_path.iterdir():
+            if entry.is_dir() and unicodedata.normalize("NFC", entry.name) == target:
+                return entry / "inspect"
+
         return self.base_path / f"{self.site_name}-配置" / "inspect"
 
     def iter_blocks(self) -> Iterator[CommandBlock]:
