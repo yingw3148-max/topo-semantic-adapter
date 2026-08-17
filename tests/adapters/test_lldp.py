@@ -1,0 +1,33 @@
+"""Tests for the Huawei LLDP neighbor adapter."""
+
+from __future__ import annotations
+
+from topo_semantic_adapter.adapters.base import AdapterContext
+from topo_semantic_adapter.adapters.huawei.lldp import LldpNeighborParser
+
+
+BRIEF_OUTPUT = """Local Intf        Neighbor Device ID        Neighbor Intf        Exptime
+GE0/0/1           edge-sw-02                GE0/0/2              120
+XG0/0/3           core-sw-03                XG0/0/4              110
+"""
+
+
+def test_parse_lldp_brief():
+    parser = LldpNeighborParser()
+    context = AdapterContext(device_ip="10.0.0.1", device_id="core-sw-01", site="site-a")
+    entities = parser.parse("display lldp neighbor brief", BRIEF_OUTPUT, context)
+
+    device_ids = {node.id for node in entities.nodes if node.kind == "device"}
+    assert "core-sw-01:device:core-sw-01" in device_ids
+    assert "edge-sw-02:device:edge-sw-02" in device_ids
+    assert "core-sw-03:device:core-sw-03" in device_ids
+
+    interface_ids = {node.id for node in entities.nodes if node.kind == "interface"}
+    assert "core-sw-01:interface:GigabitEthernet0/0/1" in interface_ids
+    assert "edge-sw-02:interface:GigabitEthernet0/0/2" in interface_ids
+    assert "core-sw-01:interface:XGigabitEthernet0/0/3" in interface_ids
+    assert "core-sw-03:interface:XGigabitEthernet0/0/4" in interface_ids
+
+    edges = entities.edges
+    assert len(edges) == 2
+    assert all(edge.relation == "connects_to" for edge in edges)

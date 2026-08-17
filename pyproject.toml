@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "topo-semantic-adapter"
+version = "0.1.0"
+description = "Domain adapter layer that translates raw ops data into standard topology graph elements."
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.11"
+authors = [
+    {name = "Topo Team", email = "topo@example.com"},
+]
+keywords = ["topology", "network", "adapter", "cli", "graph", "semantic"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    # Output target: the persistent graph store from the sibling project.
+    # Install the sibling package (toposphere-core) before installing this project.
+    "toposphere-core",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "pytest-cov"]
+
+[project.urls]
+Homepage = "https://github.com/example/topo-semantic-adapter"
+Repository = "https://github.com/example/topo-semantic-adapter"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra -q"
+
+[tool.coverage.run]
+source = ["src/topo_semantic_adapter"]
