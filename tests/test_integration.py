@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+from toposphere_core.graph.export import export_mermaid
+from toposphere_core.types import ExportOptions
+
 from topo_semantic_adapter import CLIFileLoader, GraphBuilder
 from topo_semantic_adapter.registry import AdapterRegistry
 
 
-def test_fixture_site_builds_topograph(fixture_site_path):
+def test_fixture_site_builds_topograph(fixture_site_path, capsys):
     """A real two-device fixture should produce a merged topology graph."""
     registry = AdapterRegistry()
     registry.load_builtin()
@@ -39,6 +42,16 @@ def test_fixture_site_builds_topograph(fixture_site_path):
     assert edge_ge1 is not None
     assert edge_ge1.metadata["vrrp_role_state"] == "Backup"
     assert edge_ge1.metadata["dhcp_bound_ip"] == "10.1.2.11"
+
+    # 输出 TopoGraph 视图，方便在测试日志中直接查看结果
+    print("\n=== TopoGraph summary ===")
+    print(view.export(ExportOptions(format="summary", include_metadata=True)))
+
+    print("\n=== TopoGraph skeleton ===")
+    print(view.export(ExportOptions(format="skeleton", include_metadata=True)))
+
+    print("\n=== TopoGraph Mermaid ===")
+    print(export_mermaid(view, title="湖北大学拓扑"))
 
     graph.close()
 
