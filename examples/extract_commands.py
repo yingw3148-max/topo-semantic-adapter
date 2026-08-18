@@ -84,6 +84,17 @@ def main() -> int:
         action="store_true",
         help="Prefix each command with the source file path.",
     )
+    parser.add_argument(
+        "--by-site",
+        action="store_true",
+        help="Group output by site directory (e.g. 湖北大学配置, 南开大学配置).",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        default=None,
+        help="Write output to a file instead of stdout.",
+    )
     args = parser.parse_args()
 
     base = Path(args.base_path)
@@ -94,6 +105,26 @@ def main() -> int:
     if base.resolve() == default_path.resolve():
         _ensure_example_fixtures(default_path)
 
+    def _site_name(result_file: Path) -> str:
+        """Guess the site name from the path.
+
+        Walks up from the file towards ``base`` and returns the first directory
+        whose name looks like a site folder (ends with '配置'), or the immediate
+        child directory of ``base`` as a fallback.
+        """
+        try:
+            rel_parts = result_file.relative_to(base).parts
+        except ValueError:
+            return base.name
+        # Prefer a directory named like 'xx配置'.
+        for part in rel_parts[:-1]:
+            if part.endswith("配置"):
+                return part
+        # Otherwise use the top-level subdirectory under base.
+        if len(rel_parts) > 1:
+            return rel_parts[0]
+        return base.name
+
     result_files = sorted(base.rglob("CommonCollectResult"))
     if not result_files:
         print(f"No CommonCollectResult files found under {base}", file=sys.stderr)
@@ -101,20 +132,37 @@ def main() -> int:
 
     commands: list[str] = []
     file_commands: list[tuple[Path, list[str]]] = []
+    site_commands: dict[str, list[str]] = {}
 
     for result_file in result_files:
         text = result_file.read_text(encoding="utf-8", errors="ignore")
         cmds = extract_commands(text, args.delimiter)
         file_commands.append((result_file, cmds))
         commands.extend(cmds)
+        site = _site_name(result_file)
+        site_commands.setdefault(site, []).extend(cmds)
 
-    if args.unique:
-        output = sorted(set(commands))
+    lines: list[str] = []
+
+    if args.by_site:
+        for site in sorted(site_commands):
+            lines.append(f"# {site}")
+            for cmd in sorted(set(site_commands[site])):
+                lines.append(f"  {cmd}")
+            lines.append("")
     else:
-        output = commands
+        if args.unique:
+            lines = sorted(set(commands))
+        else:
+            lines = commands
 
-    for item in output:
-        print(item)
+    if args.output:
+        out_path = Path(args.output)
+        out_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        print(f"Wrote {len(lines)} lines to {out_path}", file=sys.stderr)
+    else:
+        for line in lines:
+            print(line)
 
     if args.with_file:
         print("\n# Per-file breakdown", file=sys.stderr)

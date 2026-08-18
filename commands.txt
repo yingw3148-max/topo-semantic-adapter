@@ -1,0 +1,5 @@
+display dhcp snooping binding
+display link-aggregation verbose
+display lldp neighbor brief
+display ospf peer
+display vrrp
