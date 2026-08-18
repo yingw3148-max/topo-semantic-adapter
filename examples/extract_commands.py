@@ -43,7 +43,7 @@ def main() -> int:
     parser.add_argument(
         "base_path",
         nargs="?",
-        default=".",
+        default=str(Path(__file__).resolve().parents[1] / "tests" / "fixtures"),
         help="Root directory to scan for CommonCollectResult files.",
     )
     parser.add_argument(
