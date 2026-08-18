@@ -295,3 +295,35 @@ graphify 不试图让用户换工具，而是以插件/技能形态寄生在 Cla
 | `__main__.py` + `pyproject.toml` scripts | 终端原生入口 |
 
 综上，graphify 的启示让本项目从“一个能把 CLI 转成图形的库”进一步变成“**可验证、可解释、可嵌入现有工作流**”的拓扑适配基础设施。
+
+## 8. 推断拓扑重建
+
+CLI 巡检数据往往是局部的：你可能只采集到部分设备，或者某些关系只在一侧被显式报告。为此，本项目在确定性抽取之后增加了一层**推断拓扑重建**，其规则与 graphify 的“INFERRED”置信度一致：
+
+- 所有推断产出的节点/边都标记 `confidence="INFERRED"`；
+- 推断逻辑在 `src/topo_semantic_adapter/inference.py` 中实现，作为 `GraphBuilder` 可选的第二趟（`infer=True` 或在 CLI 中加 `--infer`）；
+- 推断结果与原图共享同一套 ID 与合并语义，因此可以与抽取结果自然叠加。
+
+### 8.1 当前推断规则
+
+1. **OSPF 邻居拓扑推断**
+
+   `display ospf peer` 只给出了本地接口与对端 Router ID。推断层会为每个对端 Router ID 创建一个 `ospf_router` 节点，并从本地设备创建一条 `peers_with` 边。这样 OSPF 不再只是接口上的元数据，而是真正参与拓扑构图。
+
+2. **LLDP 反向边推断**
+
+   LLDP 在数据层面是单向的：设备 A 报告“我能看到 B”，但 B 的回显里未必包含 A（例如 B 未采集或命令缺失）。如果图中存在 `A -> B` 的 `connects_to` 边而缺少 `B -> A`，推断层会自动补齐反向边，使下游算法看到闭合的物理链路。
+
+### 8.2 与抽取结果的关系
+
+```text
+CLI 文件
+  -> Parser（EXTRACTED）
+    -> validate.py（schema 校验）
+      -> TopoGraph（抽取事实）
+        -> inference.py（INFERRED）
+          -> TopoGraph（完整拓扑）
+            -> analysis.py / CLI / export
+```
+
+推断层不会修改已抽取的节点/边，只会追加新的 INFERRED 事实。下游分析报告的“数据来源”章节会把 EXTRACTED 与 INFERRED 的数量分别列出，方便用户区分“机器亲口说的”和“系统合理猜的”。

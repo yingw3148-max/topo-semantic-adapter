@@ -54,11 +54,13 @@ def convert_node(
     producer: str | None = None,
 ) -> TopoNode:
     """Convert an adapter internal node into a ``toposphere_core.Node``."""
+    metadata = dict(node.properties)
+    metadata.setdefault("confidence", node.confidence)
     return TopoNode(
         id=node.id,
         name=node.label or node.id,
         kind=_to_node_kind(node.kind),
-        metadata=dict(node.properties),
+        metadata=metadata,
         provenance=_make_provenance(source_file, node.source, producer),
     )
 

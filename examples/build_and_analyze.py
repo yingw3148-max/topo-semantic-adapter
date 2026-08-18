@@ -35,6 +35,11 @@ def main() -> None:
         default=None,
         help="Optional intent filter (e.g. fault_root_cause, impact_analysis).",
     )
+    parser.add_argument(
+        "--infer",
+        action="store_true",
+        help="Run second-pass inference to reconstruct missing topology nodes/edges.",
+    )
     args = parser.parse_args()
 
     site_dir = Path(args.site_dir)
@@ -54,7 +59,9 @@ def main() -> None:
     print("\n[2/5] Building TopoGraph...")
     registry = AdapterRegistry()
     registry.load_builtin()
-    builder = GraphBuilder(registry=registry, intent=args.intent, db_path=":memory:")
+    builder = GraphBuilder(
+        registry=registry, intent=args.intent, db_path=":memory:", infer=args.infer
+    )
     builder.consume_many(blocks)
     graph = builder.build()
     print(f"Nodes: {graph.get_node_count()}, Edges: {graph.get_edge_count()}")

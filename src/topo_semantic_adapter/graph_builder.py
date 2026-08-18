@@ -8,6 +8,7 @@ from toposphere_core import TopoGraph
 
 from topo_semantic_adapter.adapters.base import AdapterContext
 from topo_semantic_adapter.cli_loader import CommandBlock
+from topo_semantic_adapter.inference import infer_topology
 from topo_semantic_adapter.intent_resolver import IntentResolver
 from topo_semantic_adapter.registry import AdapterRegistry
 from topo_semantic_adapter.toposphere_bridge import convert_edge, convert_node
@@ -30,11 +31,14 @@ class GraphBuilder:
         target: TopoGraph | None = None,
         db_path: str = ":memory:",
         validate: bool = True,
+        infer: bool = False,
     ):
         self.registry = registry or AdapterRegistry()
         self.intent_profile = IntentResolver().resolve(intent) if intent else None
         self._topograph = target if target is not None else TopoGraph(db_path)
         self._validate = validate
+        self._infer = infer
+        self._inferred_applied = False
 
     def consume(self, block: CommandBlock) -> None:
         """Parse a single command block and upsert the resulting entities."""
@@ -89,6 +93,22 @@ class GraphBuilder:
         for block in blocks:
             self.consume(block)
 
+    def infer_topology(self) -> None:
+        """Apply second-pass inference rules to the current graph."""
+        view = self._topograph.to_graphview()
+        inferred = infer_topology(view)
+        for node in inferred.nodes.values():
+            self._topograph.add_node(
+                convert_node(node, producer="InferredTopologyBuilder")
+            )
+        for edge in inferred.edges.values():
+            self._topograph.add_edge(
+                convert_edge(edge, producer="InferredTopologyBuilder")
+            )
+        self._inferred_applied = True
+
     def build(self) -> TopoGraph:
         """Return the populated ``TopoGraph``."""
+        if self._infer and not self._inferred_applied:
+            self.infer_topology()
         return self._topograph

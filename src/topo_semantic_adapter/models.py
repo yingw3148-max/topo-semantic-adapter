@@ -20,6 +20,7 @@ class Node:
     label: str | None = None
     properties: dict[str, Any] = field(default_factory=dict)
     source: str | None = None  # command/adapter that produced the node
+    confidence: str = "EXTRACTED"  # EXTRACTED | INFERRED | AMBIGUOUS
 
     def __post_init__(self) -> None:
         if self.label is None:

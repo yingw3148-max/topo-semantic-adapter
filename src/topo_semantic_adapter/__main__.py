@@ -44,6 +44,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
         choices=["report", "summary", "skeleton", "mermaid"],
         help="Output format. 'report' prints the full analysis report.",
     )
+    parser.add_argument(
+        "--infer",
+        action="store_true",
+        help="Run second-pass inference to reconstruct missing topology nodes/edges.",
+    )
     return parser
 
 
@@ -72,6 +77,7 @@ def main(argv: list[str] | None = None) -> int:
         intent=args.intent,
         db_path=":memory:",
         validate=not args.no_validate,
+        infer=args.infer,
     )
     builder.consume_many(blocks)
     graph = builder.build()
