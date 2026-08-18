@@ -1,0 +1,356 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "core-sw-01",
+      "kind": "device",
+      "file_type": "concept",
+      "source_file": "湖北大学配置/inspect/10.185.0.1_core-sw-01/CommonCollectResult",
+      "metadata": {
+        "name": "core-sw-01",
+        "mgmt_ip": "10.185.0.1",
+        "device_id": "core-sw-01",
+        "confidence": "EXTRACTED",
+        "provenance": {
+          "artifact_ref": "tests\\fixtures\\湖北大学配置\\inspect\\10.185.0.1_core-sw-01\\CommonCollectResult",
+          "locator": "display lldp neighbor",
+          "method": "cli_parsing",
+          "producer": "LldpNeighborParser",
+          "producer_version": null,
+          "observed_at": null,
+          "confidence": null
+        }
+      },
+      "id": "core-sw-01:device:core-sw-01"
+    },
+    {
+      "label": "edge-sw-02",
+      "kind": "device",
+      "file_type": "concept",
+      "source_file": "湖北大学配置/inspect/10.185.0.1_core-sw-01/CommonCollectResult",
+      "metadata": {
+        "name": "edge-sw-02",
+        "confidence": "EXTRACTED",
+        "mgmt_ip": "172.16.1.9",
+        "device_id": "edge-sw-02",
+        "provenance": {
+          "artifact_ref": "tests\\fixtures\\湖北大学配置\\inspect\\10.185.0.1_core-sw-01\\CommonCollectResult",
+          "locator": "display lldp neighbor",
+          "method": "cli_parsing",
+          "producer": "LldpNeighborParser",
+          "producer_version": null,
+          "observed_at": null,
+          "confidence": null
+        }
+      },
+      "id": "edge-sw-02:device:edge-sw-02"
+    },
+    {
+      "label": "GigabitEthernet0/0/1",
+      "kind": "interface",
+      "file_type": "concept",
+      "source_file": "湖北大学配置/inspect/10.185.0.1_core-sw-01/CommonCollectResult",
+      "metadata": {
+        "name": "GigabitEthernet0/0/1",
+        "device_ip": "10.185.0.1",
+        "device_id": "core-sw-01",
+        "confidence": "EXTRACTED",
+        "ospf_neighbor_state": "Full",
+        "ospf_neighbor_router_id": "2.2.2.2",
+        "vrrp_role_state": "Master",
+        "vrrp_vrid": "1",
+        "vrrp_virtual_ip": "10.1.1.254",
+        "remote_device": "core-sw-01",
+        "provenance": {
+          "artifact_ref": "tests\\fixtures\\湖北大学配置\\inspect\\10.185.0.1_core-sw-01\\CommonCollectResult",
+          "locator": "display lldp neighbor",
+          "method": "cli_parsing",
+          "producer": "LldpNeighborParser",
+          "producer_version": null,
+          "observed_at": null,
+          "confidence": null
+        }
+      },
+      "id": "core-sw-01:interface:GigabitEthernet0/0/1"
+    },
+    {
+      "label": "GigabitEthernet0/0/1",
+      "kind": "interface",
+      "file_type": "concept",
+      "source_file": "湖北大学配置/inspect/10.185.0.1_core-sw-01/CommonCollectResult",
+      "metadata": {
+        "name": "GigabitEthernet0/0/1",
+        "remote_device": "edge-sw-02",
+        "confidence": "EXTRACTED",
+        "device_ip": "172.16.1.9",
+        "device_id": "edge-sw-02",
+        "vrrp_role_state": "Backup",
+        "vrrp_vrid": "1",
+        "vrrp_virtual_ip": "10.1.1.254",
+        "dhcp_lease_state": "bound",
+        "dhcp_bound_ip": "10.1.2.11",
+        "dhcp_bound_mac": "0001-0203-0406",
+        "dhcp_lease_time": 86000,
+        "dhcp_vlan": "20",
+        "provenance": {
+          "artifact_ref": "tests\\fixtures\\湖北大学配置\\inspect\\10.185.0.1_core-sw-01\\CommonCollectResult",
+          "locator": "display lldp neighbor",
+          "method": "cli_parsing",
+          "producer": "LldpNeighborParser",
+          "producer_version": null,
+          "observed_at": null,
+          "confidence": null
+        }
+      },
+      "id": "edge-sw-02:interface:GigabitEthernet0/0/1"
+    },
+    {
+      "label": "GigabitEthernet0/0/2",
+      "kind": "interface",
+      "file_type": "concept",
+      "source_file": "湖北大学配置/inspect/10.185.0.1_core-sw-01/CommonCollectResult",
+      "metadata": {
+        "name": "GigabitEthernet0/0/2",
+        "device_ip": "10.185.0.1",
+        "device_id": "core-sw-01",
+        "lag_member_state": "Selected",
+        "confidence": "EXTRACTED",
+        "dhcp_lease_state": "bound",
+        "dhcp_bound_ip": "10.1.1.10",
+        "dhcp_bound_mac": "0001-0203-0405",
+        "dhcp_lease_time": 86300,
+        "dhcp_vlan": "10",
+        "provenance": {
+          "artifact_ref": "tests\\fixtures\\湖北大学配置\\inspect\\10.185.0.1_core-sw-01\\CommonCollectResult",
+          "locator": "display link-aggregation verbose",
+          "method": "cli_parsing",
+          "producer": "LinkAggregationParser",
+          "producer_version": null,
+          "observed_at": null,
+          "confidence": null
+        }
+      },
+      "id": "core-sw-01:interface:GigabitEthernet0/0/2"
+    },
+    {
+      "label": "GigabitEthernet0/0/2",
+      "kind": "interface",
+      "file_type": "concept",
+      "source_file": "湖北大学配置/inspect/172.16.1.9_edge-sw-02/CommonCollectResult",
+      "metadata": {
+        "name": "GigabitEthernet0/0/2",
+        "device_ip": "172.16.1.9",
+        "device_id": "edge-sw-02",
+        "lag_member_state": "Selected",
+        "confidence": "EXTRACTED",
+        "provenance": {
+          "artifact_ref": "tests\\fixtures\\湖北大学配置\\inspect\\172.16.1.9_edge-sw-02\\CommonCollectResult",
+          "locator": "display link-aggregation verbose",
+          "method": "cli_parsing",
+          "producer": "LinkAggregationParser",
+          "producer_version": null,
+          "observed_at": null,
+          "confidence": null
+        }
+      },
+      "id": "edge-sw-02:interface:GigabitEthernet0/0/2"
+    },
+    {
+      "label": "GigabitEthernet0/0/3",
+      "kind": "interface",
+      "file_type": "concept",
+      "source_file": "湖北大学配置/inspect/10.185.0.1_core-sw-01/CommonCollectResult",
+      "metadata": {
+        "name": "GigabitEthernet0/0/3",
+        "device_ip": "10.185.0.1",
+        "device_id": "core-sw-01",
+        "lag_member_state": "Unselected",
+        "confidence": "EXTRACTED",
+        "provenance": {
+          "artifact_ref": "tests\\fixtures\\湖北大学配置\\inspect\\10.185.0.1_core-sw-01\\CommonCollectResult",
+          "locator": "display link-aggregation verbose",
+          "method": "cli_parsing",
+          "producer": "LinkAggregationParser",
+          "producer_version": null,
+          "observed_at": null,
+          "confidence": null
+        }
+      },
+      "id": "core-sw-01:interface:GigabitEthernet0/0/3"
+    },
+    {
+      "label": "Eth-Trunk1",
+      "kind": "link_aggregation_group",
+      "file_type": "concept",
+      "source_file": "湖北大学配置/inspect/10.185.0.1_core-sw-01/CommonCollectResult",
+      "metadata": {
+        "name": "Eth-Trunk1",
+        "device_ip": "10.185.0.1",
+        "device_id": "core-sw-01",
+        "confidence": "EXTRACTED",
+        "provenance": {
+          "artifact_ref": "tests\\fixtures\\湖北大学配置\\inspect\\10.185.0.1_core-sw-01\\CommonCollectResult",
+          "locator": "display link-aggregation verbose",
+          "method": "cli_parsing",
+          "producer": "LinkAggregationParser",
+          "producer_version": null,
+          "observed_at": null,
+          "confidence": null
+        }
+      },
+      "id": "core-sw-01:link_aggregation_group:Eth-Trunk1"
+    },
+    {
+      "label": "Eth-Trunk1",
+      "kind": "link_aggregation_group",
+      "file_type": "concept",
+      "source_file": "湖北大学配置/inspect/172.16.1.9_edge-sw-02/CommonCollectResult",
+      "metadata": {
+        "name": "Eth-Trunk1",
+        "device_ip": "172.16.1.9",
+        "device_id": "edge-sw-02",
+        "confidence": "EXTRACTED",
+        "provenance": {
+          "artifact_ref": "tests\\fixtures\\湖北大学配置\\inspect\\172.16.1.9_edge-sw-02\\CommonCollectResult",
+          "locator": "display link-aggregation verbose",
+          "method": "cli_parsing",
+          "producer": "LinkAggregationParser",
+          "producer_version": null,
+          "observed_at": null,
+          "confidence": null
+        }
+      },
+      "id": "edge-sw-02:link_aggregation_group:Eth-Trunk1"
+    }
+  ],
+  "edges": [
+    {
+      "relation": "connects_to",
+      "source_file": "tests/fixtures/湖北大学配置/inspect/10.185.0.1_core-sw-01/CommonCollectResult",
+      "confidence": "EXTRACTED",
+      "metadata": {
+        "protocol": "lldp",
+        "local_device": "core-sw-01",
+        "remote_device": "edge-sw-02",
+        "confidence": "EXTRACTED",
+        "provenance": {
+          "artifact_ref": "tests\\fixtures\\湖北大学配置\\inspect\\10.185.0.1_core-sw-01\\CommonCollectResult",
+          "locator": "display lldp neighbor",
+          "method": "cli_parsing",
+          "producer": "LldpNeighborParser",
+          "producer_version": null,
+          "observed_at": null,
+          "confidence": null
+        }
+      },
+      "_src": "core-sw-01:interface:GigabitEthernet0/0/1",
+      "_tgt": "edge-sw-02:interface:GigabitEthernet0/0/1",
+      "source": "core-sw-01:interface:GigabitEthernet0/0/1",
+      "target": "edge-sw-02:interface:GigabitEthernet0/0/1"
+    },
+    {
+      "relation": "member_of",
+      "source_file": "tests/fixtures/湖北大学配置/inspect/10.185.0.1_core-sw-01/CommonCollectResult",
+      "confidence": "EXTRACTED",
+      "metadata": {
+        "selected_status": "Selected",
+        "confidence": "EXTRACTED",
+        "provenance": {
+          "artifact_ref": "tests\\fixtures\\湖北大学配置\\inspect\\10.185.0.1_core-sw-01\\CommonCollectResult",
+          "locator": "display link-aggregation verbose",
+          "method": "cli_parsing",
+          "producer": "LinkAggregationParser",
+          "producer_version": null,
+          "observed_at": null,
+          "confidence": null
+        }
+      },
+      "_src": "core-sw-01:interface:GigabitEthernet0/0/2",
+      "_tgt": "core-sw-01:link_aggregation_group:Eth-Trunk1",
+      "source": "core-sw-01:interface:GigabitEthernet0/0/2",
+      "target": "core-sw-01:link_aggregation_group:Eth-Trunk1"
+    },
+    {
+      "relation": "member_of",
+      "source_file": "tests/fixtures/湖北大学配置/inspect/172.16.1.9_edge-sw-02/CommonCollectResult",
+      "confidence": "EXTRACTED",
+      "metadata": {
+        "selected_status": "Selected",
+        "confidence": "EXTRACTED",
+        "provenance": {
+          "artifact_ref": "tests\\fixtures\\湖北大学配置\\inspect\\172.16.1.9_edge-sw-02\\CommonCollectResult",
+          "locator": "display link-aggregation verbose",
+          "method": "cli_parsing",
+          "producer": "LinkAggregationParser",
+          "producer_version": null,
+          "observed_at": null,
+          "confidence": null
+        }
+      },
+      "_src": "edge-sw-02:interface:GigabitEthernet0/0/2",
+      "_tgt": "edge-sw-02:link_aggregation_group:Eth-Trunk1",
+      "source": "edge-sw-02:interface:GigabitEthernet0/0/2",
+      "target": "edge-sw-02:link_aggregation_group:Eth-Trunk1"
+    },
+    {
+      "relation": "member_of",
+      "source_file": "tests/fixtures/湖北大学配置/inspect/10.185.0.1_core-sw-01/CommonCollectResult",
+      "confidence": "EXTRACTED",
+      "metadata": {
+        "selected_status": "Unselected",
+        "confidence": "EXTRACTED",
+        "provenance": {
+          "artifact_ref": "tests\\fixtures\\湖北大学配置\\inspect\\10.185.0.1_core-sw-01\\CommonCollectResult",
+          "locator": "display link-aggregation verbose",
+          "method": "cli_parsing",
+          "producer": "LinkAggregationParser",
+          "producer_version": null,
+          "observed_at": null,
+          "confidence": null
+        }
+      },
+      "_src": "core-sw-01:interface:GigabitEthernet0/0/3",
+      "_tgt": "core-sw-01:link_aggregation_group:Eth-Trunk1",
+      "source": "core-sw-01:interface:GigabitEthernet0/0/3",
+      "target": "core-sw-01:link_aggregation_group:Eth-Trunk1"
+    }
+  ],
+  "communities": {
+    "0": {
+      "label": "Eth-Trunk1",
+      "nodes": [
+        "core-sw-01:interface:GigabitEthernet0/0/2",
+        "core-sw-01:interface:GigabitEthernet0/0/3",
+        "core-sw-01:link_aggregation_group:Eth-Trunk1"
+      ]
+    },
+    "1": {
+      "label": "GigabitEthernet0/0/1",
+      "nodes": [
+        "core-sw-01:interface:GigabitEthernet0/0/1",
+        "edge-sw-02:interface:GigabitEthernet0/0/1"
+      ]
+    },
+    "2": {
+      "label": "GigabitEthernet0/0/2",
+      "nodes": [
+        "edge-sw-02:interface:GigabitEthernet0/0/2",
+        "edge-sw-02:link_aggregation_group:Eth-Trunk1"
+      ]
+    },
+    "3": {
+      "label": "core-sw-01",
+      "nodes": [
+        "core-sw-01:device:core-sw-01"
+      ]
+    },
+    "4": {
+      "label": "edge-sw-02",
+      "nodes": [
+        "edge-sw-02:device:edge-sw-02"
+      ]
+    }
+  }
+}

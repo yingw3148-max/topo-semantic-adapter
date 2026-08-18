@@ -30,6 +30,9 @@ topo-semantic-adapter = "topo_semantic_adapter.__main__:main"
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0", "pytest-cov"]
+graphify = ["graphifyy"]
+llm = ["openai>=1.0"]
+all = ["graphifyy", "openai>=1.0"]
 
 [project.urls]
 Homepage = "https://github.com/example/topo-semantic-adapter"
