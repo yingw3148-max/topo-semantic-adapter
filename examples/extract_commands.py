@@ -18,9 +18,29 @@ import argparse
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+_PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(_PROJECT_ROOT / "src"))
+sys.path.insert(0, str(_PROJECT_ROOT))
 
 from topo_semantic_adapter.cli_loader import DEFAULT_DELIMITER
+
+
+def _ensure_example_fixtures(default_path: Path) -> None:
+    """If the default tests/fixtures directory is empty, regenerate sample files."""
+    if not default_path.exists() or not list(default_path.rglob("CommonCollectResult")):
+        try:
+            from tests.fixtures import write_fixture_site
+
+            write_fixture_site(default_path)
+            print(
+                f"# Regenerated example fixtures under {default_path}",
+                file=sys.stderr,
+            )
+        except Exception as exc:  # pragma: no cover
+            print(
+                f"# Could not auto-generate example fixtures: {exc}",
+                file=sys.stderr,
+            )
 
 
 def extract_commands(text: str, delimiter: str) -> list[str]:
@@ -37,13 +57,15 @@ def extract_commands(text: str, delimiter: str) -> list[str]:
 
 
 def main() -> int:
+    default_path = _PROJECT_ROOT / "tests" / "fixtures"
+
     parser = argparse.ArgumentParser(
         description="Extract command names from CLI inspection files."
     )
     parser.add_argument(
         "base_path",
         nargs="?",
-        default=str(Path(__file__).resolve().parents[1] / "tests" / "fixtures"),
+        default=str(default_path),
         help="Root directory to scan for CommonCollectResult files.",
     )
     parser.add_argument(
@@ -68,6 +90,9 @@ def main() -> int:
     if not base.exists():
         print(f"Error: path does not exist: {base}", file=sys.stderr)
         return 1
+
+    if base.resolve() == default_path.resolve():
+        _ensure_example_fixtures(default_path)
 
     result_files = sorted(base.rglob("CommonCollectResult"))
     if not result_files:
