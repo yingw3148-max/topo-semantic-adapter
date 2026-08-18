@@ -70,11 +70,13 @@ def convert_edge(
     producer: str | None = None,
 ) -> TopoEdge:
     """Convert an adapter internal edge into a ``toposphere_core.Edge``."""
+    metadata = dict(edge.properties)
+    metadata.setdefault("confidence", edge.confidence)
     return TopoEdge(
         source=edge.source,
         target=edge.target,
         kind=_to_edge_kind(edge.relation),
-        metadata=dict(edge.properties),
+        metadata=metadata,
         id=edge.id,
         provenance=_make_provenance(source_file, edge.provenance or edge.relation, producer),
     )

@@ -36,6 +36,7 @@ class Edge:
     relation: str
     properties: dict[str, Any] = field(default_factory=dict)
     provenance: str | None = None  # command/adapter that produced the edge
+    confidence: str = "EXTRACTED"  # EXTRACTED | INFERRED | AMBIGUOUS
 
 
 @dataclass

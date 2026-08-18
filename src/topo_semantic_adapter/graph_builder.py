@@ -11,6 +11,7 @@ from topo_semantic_adapter.cli_loader import CommandBlock
 from topo_semantic_adapter.intent_resolver import IntentResolver
 from topo_semantic_adapter.registry import AdapterRegistry
 from topo_semantic_adapter.toposphere_bridge import convert_edge, convert_node
+from topo_semantic_adapter.validate import validate_parsed_entity
 
 
 class GraphBuilder:
@@ -28,10 +29,12 @@ class GraphBuilder:
         *,
         target: TopoGraph | None = None,
         db_path: str = ":memory:",
+        validate: bool = True,
     ):
         self.registry = registry or AdapterRegistry()
         self.intent_profile = IntentResolver().resolve(intent) if intent else None
         self._topograph = target if target is not None else TopoGraph(db_path)
+        self._validate = validate
 
     def consume(self, block: CommandBlock) -> None:
         """Parse a single command block and upsert the resulting entities."""
@@ -51,6 +54,15 @@ class GraphBuilder:
             intent=self.intent_profile.intent if self.intent_profile else None,
         )
         entities = parser.parse(block.command, block.output, context)
+
+        if self._validate:
+            errors = validate_parsed_entity(entities)
+            if errors:
+                raise ValueError(
+                    f"Validation failed for command {block.command!r}: "
+                    + "; ".join(errors)
+                )
+
         producer = parser.__class__.__name__
 
         for node in entities.nodes:

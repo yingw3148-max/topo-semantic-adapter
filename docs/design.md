@@ -250,3 +250,48 @@ Result TopoGraph:
 1. 创建 `adapters/h3c/` 目录。
 2. 实现 `H3CSemanticAdapter` 与对应 Parser。
 3. 在 `AdapterRegistry.load_builtin()` 中注册。
+
+## 7. 借鉴 graphify 的设计启示
+
+[graphify](https://github.com/...) 是 2026 年“上下文工程”浪潮中极具代表性的代码知识图谱工具。它的核心主张不是用 LLM 端到端地“理解”代码，而是回到“代码本质是结构化图”的第一性原理：**确定性解析打底、LLM 语义补层、置信度标签兜底**，并以技能/插件形态进入开发者已有的工作流。这一思路对本项目有三条可直接迁移的启示。
+
+### 7.1 确定性优先
+
+网络运维数据（CLI 回显）本身就是高度结构化的命令-输出对。能用正则、AST 或状态机确定性抽取的关系，就不应交给生成式模型。因此：
+
+- 所有 Parser 均基于确定性规则（正则、字符串分割、关键词匹配）实现，不依赖 LLM。
+- 新增 `src/topo_semantic_adapter/validate.py` 校验层，对每个 Parser 产出的 `ParsedEntity` 做 schema 检查：节点 ID 唯一、边端点存在、类型/关系非空、`confidence` 合法。
+- `GraphBuilder` 默认开启校验（`validate=True`），让不符合规范的数据在入图前即失败，而不是以噪声形式污染 `TopoGraph`。
+
+### 7.2 可解释性内建
+
+graphify 用 `EXTRACTED / INFERRED / AMBIGUOUS` 标签回答“这条关系是事实还是推断”。本项目把同样的思路内建到图里：
+
+- `Edge.confidence` 默认为 `EXTRACTED`，未来对于跨源推断、拓扑补全等场景可标记为 `INFERRED` 或 `AMBIGUOUS`。
+- `toposphere_bridge.py` 把 `confidence` 写入 `TopoEdge.metadata`，并在 `Provenance` 中记录来源文件、命令字符串和 Parser 类名。
+- `analysis.py` 生成的报告新增“数据来源”章节，列出：
+  - 边的置信度分布；
+  - 每个 Parser 对图的贡献次数；
+  - 单点故障、异常信号等分析结论都可以追溯到原始命令块。
+
+这样，下游 Agent 或工程师不需要“信任黑盒”，而是可以直接验证每条边来自哪台设备的哪条命令、由哪个 Parser 产出、置信度如何。
+
+### 7.3 去用户已经在的地方
+
+graphify 不试图让用户换工具，而是以插件/技能形态寄生在 Claude Code、Cursor、VS Code 等已有环境里。对网络运维场景而言，工程师的日常环境是终端、CMDB、监控平台和 CI 流水线，而不是 Python REPL。因此：
+
+- 新增 CLI 入口 `topo-semantic-adapter <site_dir>`（也支持 `python -m topo_semantic_adapter`）。
+- CLI 直接输出 Markdown 报告、Mermaid 图、summary 或 skeleton，可嵌入到 shell 脚本、GitHub Actions、Jenkins 等现有流程。
+- 意图过滤（`--intent`）让同一份原始数据在不改代码的情况下服务不同下游任务（故障根因定位、影响范围分析）。
+
+### 7.4 带来的模块变化
+
+| 新增/修改 | 作用 |
+|-----------|------|
+| `validate.py` | schema 校验，确定性守门 |
+| `Edge.confidence` | 事实 / 推断 / 可疑 的可解释标签 |
+| `toposphere_bridge.py` | 把 confidence 与 Provenance 写入 `toposphere_core` |
+| `analysis.py` | 社区、中心性、单点故障、异常信号 + 可解释报告 |
+| `__main__.py` + `pyproject.toml` scripts | 终端原生入口 |
+
+综上，graphify 的启示让本项目从“一个能把 CLI 转成图形的库”进一步变成“**可验证、可解释、可嵌入现有工作流**”的拓扑适配基础设施。

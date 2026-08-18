@@ -25,6 +25,9 @@ dependencies = [
     "toposphere-core",
 ]
 
+[project.scripts]
+topo-semantic-adapter = "topo_semantic_adapter.__main__:main"
+
 [project.optional-dependencies]
 dev = ["pytest>=7.0", "pytest-cov"]
 

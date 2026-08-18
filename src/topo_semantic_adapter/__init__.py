@@ -6,6 +6,7 @@ from topo_semantic_adapter.adapters.base import (
     ParsedEntity,
     SemanticAdapter,
 )
+from topo_semantic_adapter.analysis import analyze, generate_report
 from topo_semantic_adapter.cli_loader import CLIFileLoader, CommandBlock
 from topo_semantic_adapter.graph_builder import GraphBuilder
 from topo_semantic_adapter.intent_resolver import IntentProfile, IntentResolver
@@ -26,4 +27,6 @@ __all__ = [
     "Node",
     "ParsedEntity",
     "SemanticAdapter",
+    "analyze",
+    "generate_report",
 ]

@@ -114,7 +114,28 @@ print(graph.get_node_count(), graph.get_edge_count())
 view = graph.to_graphview()
 ```
 
-## 6. 扩展一个适配器
+## 6. 命令行使用
+
+安装后可以直接在终端运行：
+
+```bash
+# 分析一个站点目录，输出完整报告
+python -m topo_semantic_adapter /data/sites/湖北大学配置
+
+# 或安装为命令
+pip install -e .
+topo-semantic-adapter /data/sites/湖北大学配置
+
+# 按意图过滤
+python -m topo_semantic_adapter /data/sites/湖北大学配置 --intent impact_analysis
+
+# 只输出 TopoGraph 摘要 / 骨架 / Mermaid
+python -m topo_semantic_adapter /data/sites/湖北大学配置 --format summary
+python -m topo_semantic-adapter /data/sites/湖北大学配置 --format skeleton
+python -m topo_semantic_adapter /data/sites/湖北大学配置 --format mermaid
+```
+
+## 7. 扩展一个适配器
 
 实现 `CommandParser` 并注册到 `AdapterRegistry` 即可：
 
@@ -131,7 +152,7 @@ class MyParser(CommandParser):
 registry.register(MyParser())
 ```
 
-## 7. 设计文档
+## 8. 设计文档
 
 详细设计文档见 `docs/design.md`，包含：
 
@@ -142,7 +163,7 @@ registry.register(MyParser())
 - 关键流程时序图（CLI → Parser → TopoGraph）
 - 扩展指南
 
-## 8. 测试
+## 9. 测试
 
 ```bash
 # 建议先安装到可编辑模式
@@ -152,7 +173,7 @@ pip install -e ".[dev]"
 pytest
 ```
 
-## 9. 与 network-topology-skills / topograph-py 的协作
+## 10. 与 network-topology-skills / topograph-py 的协作
 
 - **network-topology-skills** 提供领域概念（如“链路聚合组”应有哪些属性、设备类型层级），`topo-semantic-adapter` 在提取时尽可能对齐这些概念，但两者保持松耦合。
 - **topograph-py**（包名 `toposphere-core`）提供图存储与查询。`topo-semantic-adapter` 直接输出 `toposphere_core.TopoGraph`，并通过 `toposphere_bridge.py` 完成中间模型到 `toposphere_core.Node` / `toposphere_core.Edge` 的转换。
