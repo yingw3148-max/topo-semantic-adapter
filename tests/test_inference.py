@@ -11,12 +11,10 @@ from topo_semantic_adapter.inference import (
     infer_topology,
 )
 from topo_semantic_adapter.registry import AdapterRegistry
-from tests.fixtures import write_fixture_site
 
 
-def _build_view(tmp_path, *, infer: bool = False):
-    site_dir = write_fixture_site(tmp_path)
-    loader = CLIFileLoader(site_name="湖北大学配置", base_path=site_dir.parent)
+def _build_view(site_path, *, infer: bool = False):
+    loader = CLIFileLoader(site_name="湖北大学配置", base_path=site_path.parent)
     blocks = list(loader.iter_blocks())
 
     registry = AdapterRegistry()
@@ -103,8 +101,8 @@ def test_infer_lldp_reverse_edge_for_one_sided_lldp():
     assert edge.confidence == "INFERRED"
 
 
-def test_graph_builder_with_infer_adds_ospf_router(tmp_path):
-    view, graph = _build_view(tmp_path, infer=True)
+def test_graph_builder_with_infer_adds_ospf_router(fixture_site_path):
+    view, graph = _build_view(fixture_site_path, infer=True)
 
     router_ids = {
         node_id
@@ -121,8 +119,8 @@ def test_graph_builder_with_infer_adds_ospf_router(tmp_path):
     graph.close()
 
 
-def test_graph_builder_without_infer_keeps_original_counts(tmp_path):
-    view, graph = _build_view(tmp_path, infer=False)
+def test_graph_builder_without_infer_keeps_original_counts(fixture_site_path):
+    view, graph = _build_view(fixture_site_path, infer=False)
 
     router_ids = {
         node_id
@@ -133,8 +131,8 @@ def test_graph_builder_without_infer_keeps_original_counts(tmp_path):
     graph.close()
 
 
-def test_infer_topology_combines_rules(tmp_path):
-    view, graph = _build_view(tmp_path, infer=True)
+def test_infer_topology_combines_rules(fixture_site_path):
+    view, graph = _build_view(fixture_site_path, infer=True)
     # OSPF router node + peers_with edge; LLDP is already symmetric so no
     # reverse edges are inferred.
     assert any(node.kind == "ospf_router" for node in view.nodes.values())

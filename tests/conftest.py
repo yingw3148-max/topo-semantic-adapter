@@ -8,19 +8,19 @@ import pytest
 
 from topo_semantic_adapter.adapters.base import AdapterContext
 from topo_semantic_adapter.registry import AdapterRegistry
-from tests.fixtures import write_fixture_site
 
 
 @pytest.fixture(scope="session")
-def fixture_site_path(tmp_path_factory) -> Path:
-    """Return a generated copy of the sample production site directory.
+def fixture_site_path() -> Path:
+    """Return the static sample production site directory.
 
-    The content is identical to the static files under ``tests/fixtures/湖北大学配置``,
-    but generating it at runtime guarantees tests pass even when only the tracked
-    source files are copied.
+    Tests operate directly on the files under ``tests/fixtures/湖北大学配置`` so that
+    local production sample data can be swapped in without changing test code.
     """
-    site_root = tmp_path_factory.mktemp("fixture-site")
-    return write_fixture_site(site_root)
+    site_dir = Path(__file__).resolve().parent / "fixtures" / "湖北大学配置"
+    if not site_dir.is_dir():
+        pytest.skip(f"Sample fixture site not found: {site_dir}")
+    return site_dir
 
 
 @pytest.fixture

@@ -7,12 +7,10 @@ import pytest
 pytest.importorskip("toposphere_core")
 
 from topo_semantic_adapter.__main__ import main
-from tests.fixtures import write_fixture_site
 
 
-def test_cli_report_output(tmp_path, capsys):
-    site_dir = write_fixture_site(tmp_path)
-    rc = main([str(site_dir)])
+def test_cli_report_output(fixture_site_path, capsys):
+    rc = main([str(fixture_site_path)])
     assert rc == 0
 
     captured = capsys.readouterr()
@@ -20,16 +18,14 @@ def test_cli_report_output(tmp_path, capsys):
     assert "节点数: 9" in captured.out
 
 
-def test_cli_summary_format(tmp_path, capsys):
-    site_dir = write_fixture_site(tmp_path)
-    rc = main([str(site_dir), "--format", "summary"])
+def test_cli_summary_format(fixture_site_path, capsys):
+    rc = main([str(fixture_site_path), "--format", "summary"])
     assert rc == 0
     assert "Graph Summary" in capsys.readouterr().out
 
 
-def test_cli_intent_filter(tmp_path, capsys):
-    site_dir = write_fixture_site(tmp_path)
-    rc = main([str(site_dir), "--intent", "impact_analysis", "--format", "summary"])
+def test_cli_intent_filter(fixture_site_path, capsys):
+    rc = main([str(fixture_site_path), "--intent", "impact_analysis", "--format", "summary"])
     assert rc == 0
     out = capsys.readouterr().out
     assert "Nodes:" in out

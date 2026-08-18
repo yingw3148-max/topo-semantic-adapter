@@ -16,12 +16,10 @@ from topo_semantic_adapter.analysis import (
     unselected_lag_members,
 )
 from topo_semantic_adapter.registry import AdapterRegistry
-from tests.fixtures import write_fixture_site
 
 
-def _build_sample_graph(tmp_path):
-    site_dir = write_fixture_site(tmp_path)
-    loader = CLIFileLoader(site_name="湖北大学配置", base_path=site_dir.parent)
+def _build_sample_graph(site_path):
+    loader = CLIFileLoader(site_name="湖北大学配置", base_path=site_path.parent)
     blocks = list(loader.iter_blocks())
 
     registry = AdapterRegistry()
@@ -31,15 +29,15 @@ def _build_sample_graph(tmp_path):
     return builder.build()
 
 
-def test_to_graphview(tmp_path):
-    graph = _build_sample_graph(tmp_path)
+def test_to_graphview(fixture_site_path):
+    graph = _build_sample_graph(fixture_site_path)
     view = to_graphview(graph)
     assert view.node_count() == 9
     assert view.edge_count() == 5
 
 
-def test_graph_summary(tmp_path):
-    graph = _build_sample_graph(tmp_path)
+def test_graph_summary(fixture_site_path):
+    graph = _build_sample_graph(fixture_site_path)
     summary = graph_summary(to_graphview(graph))
     assert summary["node_count"] == 9
     assert summary["edge_count"] == 5
@@ -49,16 +47,16 @@ def test_graph_summary(tmp_path):
     assert summary["edge_count_by_kind"]["member_of"] == 3
 
 
-def test_god_nodes(tmp_path):
-    graph = _build_sample_graph(tmp_path)
+def test_god_nodes(fixture_site_path):
+    graph = _build_sample_graph(fixture_site_path)
     top = god_nodes(to_graphview(graph), top_n=3)
     assert len(top) == 3
     # Degree is non-increasing.
     assert top[0][1] >= top[1][1] >= top[2][1]
 
 
-def test_communities(tmp_path):
-    graph = _build_sample_graph(tmp_path)
+def test_communities(fixture_site_path):
+    graph = _build_sample_graph(fixture_site_path)
     groups = communities(to_graphview(graph))
     assert len(groups) >= 1
     # Every node belongs to exactly one community.
@@ -66,8 +64,8 @@ def test_communities(tmp_path):
     assert total == 9
 
 
-def test_single_points_of_failure(tmp_path):
-    graph = _build_sample_graph(tmp_path)
+def test_single_points_of_failure(fixture_site_path):
+    graph = _build_sample_graph(fixture_site_path)
     spof = single_points_of_failure(to_graphview(graph))
 
     # The three LAG member edges are leaf bridges (each connects a single
@@ -82,28 +80,28 @@ def test_single_points_of_failure(tmp_path):
     assert "core-sw-01:link_aggregation_group:Eth-Trunk1" in articulation_ids
 
 
-def test_orphan_interfaces(tmp_path):
-    graph = _build_sample_graph(tmp_path)
+def test_orphan_interfaces(fixture_site_path):
+    graph = _build_sample_graph(fixture_site_path)
     orphans = orphan_interfaces(to_graphview(graph))
     assert orphans == []
 
 
-def test_unhealthy_ospf(tmp_path):
-    graph = _build_sample_graph(tmp_path)
+def test_unhealthy_ospf(fixture_site_path):
+    graph = _build_sample_graph(fixture_site_path)
     bad = unhealthy_ospf(to_graphview(graph))
     assert bad == []
 
 
-def test_unselected_lag_members(tmp_path):
-    graph = _build_sample_graph(tmp_path)
+def test_unselected_lag_members(fixture_site_path):
+    graph = _build_sample_graph(fixture_site_path)
     members = unselected_lag_members(to_graphview(graph))
     assert len(members) == 1
     assert members[0]["interface_id"] == "core-sw-01:interface:GigabitEthernet0/0/3"
     assert members[0]["selected_status"] == "Unselected"
 
 
-def test_analyze_returns_all_sections(tmp_path):
-    graph = _build_sample_graph(tmp_path)
+def test_analyze_returns_all_sections(fixture_site_path):
+    graph = _build_sample_graph(fixture_site_path)
     result = analyze(graph)
     assert set(result) == {
         "summary",
@@ -118,8 +116,8 @@ def test_analyze_returns_all_sections(tmp_path):
     }
 
 
-def test_generate_report_contains_key_sections(tmp_path):
-    graph = _build_sample_graph(tmp_path)
+def test_generate_report_contains_key_sections(fixture_site_path):
+    graph = _build_sample_graph(fixture_site_path)
     report = generate_report(graph)
     assert "# 拓扑分析报告" in report
     assert "## 概要" in report
